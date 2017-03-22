@@ -1,0 +1,35 @@
+---
+# This playbook installs and enables IIS on Windows hosts
+# ansible-directories.yml
+# Create directories for ansible playbooks.
+#
+# Example Usage:
+# Create a single role.
+# $ ansible-playbook --extra-vars 'roles=some-role' ansible-directories.yml
+# or
+# Create multiple roles.
+# $ ansible-playbook \
+#      --extra-vars '{"roles":["common", "webservers", "dbservers"]}' \
+#      ansible-directories.yml
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: Create directory structure
+    win_file:
+      path: C:\inetpub\Deneme
+      state: directory
+  - name: Create a new application pool in 'Started' state
+    win_iis_webapppool:
+      name: Deneme_AppPool
+      state: started
+  - name: create web site
+    win_iis_website:
+      name: "Deneme"
+      state: started
+      port: 80
+      ip: 127.0.0.1
+      hostname: deneme.finansbank.com.tr
+      application_pool: "Deneme_AppPool"
+      physical_path: C:\inetpub\Deneme
+      parameters: logfile.directory:c:\sites\logs
+      register: website
